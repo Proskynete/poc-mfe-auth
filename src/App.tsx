@@ -1,5 +1,8 @@
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import { Form, Button, Row, Col, Container } from "react-bootstrap";
+import { GlobalStore } from "redux-micro-frontend";
+import { LoginAction, RolesAllowed } from "./store/authActions";
+import configureStore from "./store/storeConfig";
 
 const App = () => {
   const [state, setState] = useState({ username: "", password: "" });
@@ -11,7 +14,16 @@ const App = () => {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const globalStore = GlobalStore.Get();
+    globalStore.DispatchAction(
+      "AuthApp",
+      LoginAction(state.username as RolesAllowed)
+    );
   };
+
+  useEffect(() => {
+    configureStore();
+  }, []);
 
   return (
     <Container fluid style={{ width: "100vw", height: "100vh" }}>
@@ -22,6 +34,7 @@ const App = () => {
               <Form.Label>Email address</Form.Label>
               <Form.Control
                 type="text"
+                name="username"
                 placeholder="Enter email"
                 value={state.username}
                 onChange={handleChange}
@@ -32,6 +45,7 @@ const App = () => {
               <Form.Label>Password</Form.Label>
               <Form.Control
                 type="password"
+                name="password"
                 placeholder="Password"
                 value={state.password}
                 onChange={handleChange}
